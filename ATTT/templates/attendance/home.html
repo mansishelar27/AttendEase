@@ -6,8 +6,8 @@
 <!-- Hero Section with Light Background -->
 <div class="hero-section-light text-center py-5 mb-5">
     <div class="container">
-        <div class="row align-items-center">
-            <div class="col-lg-6 mb-4 mb-lg-0">
+        <div class="row justify-content-center">
+            <div class="col-lg-8 mb-4 mb-lg-0">
                 <div class="hero-content">
                     <div class="hero-icon mb-4">
                         <i class="fas fa-graduation-cap"></i>
@@ -35,22 +35,36 @@
                         </a>
                     </div>
                     {% endif %}
-                </div>
-            </div>
-            <div class="col-lg-6">
-                <div class="hero-image-container">
-                    <div class="floating-card card-1">
-                        <i class="fas fa-calendar-check"></i>
-                        <span>Digital Attendance</span>
+                    
+                    <!-- Static Feature Cards Below Login -->
+                    {% if not user.is_authenticated %}
+                    <div class="row mt-5 g-3">
+                        <div class="col-md-4">
+                            <div class="static-feature-card">
+                                <div class="static-feature-icon icon-primary-static">
+                                    <i class="fas fa-calendar-check"></i>
+                                </div>
+                                <span class="static-feature-text">Digital Attendance</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="static-feature-card">
+                                <div class="static-feature-icon icon-warning-static">
+                                    <i class="fas fa-users"></i>
+                                </div>
+                                <span class="static-feature-text">Easy Management</span>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="static-feature-card">
+                                <div class="static-feature-icon icon-success-static">
+                                    <i class="fas fa-chart-line"></i>
+                                </div>
+                                <span class="static-feature-text">Real-time Stats</span>
+                            </div>
+                        </div>
                     </div>
-                    <div class="floating-card card-2">
-                        <i class="fas fa-chart-line"></i>
-                        <span>Real-time Stats</span>
-                    </div>
-                    <div class="floating-card card-3">
-                        <i class="fas fa-users"></i>
-                        <span>Easy Management</span>
-                    </div>
+                    {% endif %}
                 </div>
             </div>
         </div>
