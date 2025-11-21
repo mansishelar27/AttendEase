@@ -18,15 +18,23 @@
                     <p class="lead text-muted mb-4">A modern, web-based student attendance tracking system that simplifies attendance management for teachers and provides transparency for students.</p>
                     {% if not user.is_authenticated %}
                     <div class="hero-buttons">
-                        <a href="{% url 'student_register' %}" class="btn btn-primary btn-lg me-3 mb-2">
-                            <i class="fas fa-user-graduate me-2"></i>Register as Student
-                        </a>
-                        <a href="{% url 'teacher_register' %}" class="btn btn-success btn-lg me-3 mb-2">
-                            <i class="fas fa-chalkboard-teacher me-2"></i>Register as Teacher
-                        </a>
-                        <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg mb-2">
-                            <i class="fas fa-sign-in-alt me-2"></i>Login
-                        </a>
+                        <div class="row justify-content-center g-3 mb-3">
+                            <div class="col-md-6">
+                                <a href="{% url 'student_register' %}" class="btn btn-primary btn-xl w-100">
+                                    <i class="fas fa-user-graduate me-2"></i>Register as Student
+                                </a>
+                            </div>
+                            <div class="col-md-6">
+                                <a href="{% url 'teacher_register' %}" class="btn btn-success btn-xl w-100">
+                                    <i class="fas fa-chalkboard-teacher me-2"></i>Register as Teacher
+                                </a>
+                            </div>
+                        </div>
+                        <div class="text-center">
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary btn-lg">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        </div>
                     </div>
                     {% else %}
                     <div class="hero-buttons">
@@ -35,45 +43,6 @@
                         </a>
                     </div>
                     {% endif %}
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<!-- Features Section with Light Background -->
-<div class="features-section-light py-5">
-    <div class="container">
-        <div class="text-center mb-5">
-            <h2 class="display-5 fw-bold mb-3">Key Features</h2>
-            <p class="text-muted lead">Everything you need for efficient attendance management</p>
-        </div>
-        <div class="row g-4">
-            <div class="col-md-4 mb-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper icon-primary">
-                        <i class="fas fa-calendar-check"></i>
-                    </div>
-                    <h4 class="mt-4 mb-3">Digital Attendance</h4>
-                    <p class="text-muted">Teachers can easily mark attendance digitally, eliminating paper-based systems and reducing errors.</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper icon-success">
-                        <i class="fas fa-chart-line"></i>
-                    </div>
-                    <h4 class="mt-4 mb-3">Real-time Tracking</h4>
-                    <p class="text-muted">Students can view their attendance records in real-time with detailed statistics and percentages.</p>
-                </div>
-            </div>
-            <div class="col-md-4 mb-4">
-                <div class="feature-card h-100">
-                    <div class="feature-icon-wrapper icon-warning">
-                        <i class="fas fa-calendar-times"></i>
-                    </div>
-                    <h4 class="mt-4 mb-3">Leave Management</h4>
-                    <p class="text-muted">Students can apply for leave online, and teachers can approve or reject requests efficiently.</p>
                 </div>
             </div>
         </div>
