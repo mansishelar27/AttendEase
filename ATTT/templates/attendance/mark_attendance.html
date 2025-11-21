@@ -1,0 +1,203 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Mark Attendance - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-edit me-2"></i>Mark Attendance</h2>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Select Date and Mark Attendance</h5>
+            </div>
+            <div class="card-body">
+                <form method="post" id="attendanceForm">
+                    {% csrf_token %}
+                    
+                    <!-- Date Selection -->
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <label for="date" class="form-label">Select Date</label>
+                            <input type="date" class="form-control" id="date" name="date" required>
+                        </div>
+                        <div class="col-md-8 d-flex align-items-end">
+                            <button type="button" class="btn btn-info me-2" onclick="setToday()">
+                                <i class="fas fa-calendar-day me-1"></i>Today
+                            </button>
+                            <button type="button" class="btn btn-secondary" onclick="loadAttendanceForDate()">
+                                <i class="fas fa-search me-1"></i>Load Existing
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Attendance Table -->
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Date</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for student in students %}
+                                <tr>
+                                    <td>{{ student.roll_no }}</td>
+                                    <td>{{ student.name }}</td>
+                                    <td>
+                                        <span class="date-display" id="date_display_{{ student.id }}">
+                                            <i class="fas fa-calendar me-1"></i>
+                                            <span class="date-text">-</span>
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div class="btn-group" role="group">
+                                            <input type="radio" class="btn-check" name="student_{{ student.id }}" id="present_{{ student.id }}" value="present">
+                                            <label class="btn btn-outline-success" for="present_{{ student.id }}">
+                                                <i class="fas fa-check me-1"></i>Present
+                                            </label>
+                                            
+                                            <input type="radio" class="btn-check" name="student_{{ student.id }}" id="absent_{{ student.id }}" value="absent">
+                                            <label class="btn btn-outline-danger" for="absent_{{ student.id }}">
+                                                <i class="fas fa-times me-1"></i>Absent
+                                            </label>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="row mt-4">
+                        <div class="col-12">
+                            <div class="d-flex justify-content-between">
+                                <button type="button" class="btn btn-warning" onclick="markAllPresent()">
+                                    <i class="fas fa-check-double me-2"></i>Mark All Present
+                                </button>
+                                <div>
+                                    <button type="button" class="btn btn-secondary me-2" onclick="clearAll()">
+                                        <i class="fas fa-eraser me-2"></i>Clear All
+                                    </button>
+                                    <button type="submit" class="btn btn-primary">
+                                        <i class="fas fa-save me-2"></i>Save Attendance
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function formatDate(dateString) {
+        if (!dateString) return '-';
+        const date = new Date(dateString + 'T00:00:00');
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    function updateDateDisplay() {
+        const dateInput = document.getElementById('date');
+        const dateValue = dateInput.value;
+        const dateTexts = document.querySelectorAll('.date-text');
+        
+        if (dateValue) {
+            const formattedDate = formatDate(dateValue);
+            dateTexts.forEach(text => {
+                text.textContent = formattedDate;
+            });
+        } else {
+            dateTexts.forEach(text => {
+                text.textContent = '-';
+            });
+        }
+    }
+    
+    function setToday() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('date').value = today;
+        updateDateDisplay();
+        loadAttendanceForDate();
+    }
+    
+    function markAllPresent() {
+        const presentRadios = document.querySelectorAll('input[value="present"]');
+        presentRadios.forEach(radio => {
+            radio.checked = true;
+        });
+    }
+    
+    function clearAll() {
+        const allRadios = document.querySelectorAll('input[type="radio"]');
+        allRadios.forEach(radio => {
+            radio.checked = false;
+        });
+    }
+    
+    function loadAttendanceForDate() {
+        const date = document.getElementById('date').value;
+        if (!date) {
+            alert('Please select a date first.');
+            return;
+        }
+        
+        // Clear all selections first
+        clearAll();
+        
+        // Here you could add AJAX call to load existing attendance for the selected date
+        // For now, we'll just show a message
+        console.log('Loading attendance for date:', date);
+    }
+    
+    // Set today's date by default
+    document.addEventListener('DOMContentLoaded', function() {
+        setToday();
+        
+        // Update date display when date input changes
+        const dateInput = document.getElementById('date');
+        dateInput.addEventListener('change', updateDateDisplay);
+        dateInput.addEventListener('input', updateDateDisplay);
+    });
+    
+    // Form validation
+    document.getElementById('attendanceForm').addEventListener('submit', function(e) {
+        const date = document.getElementById('date').value;
+        if (!date) {
+            e.preventDefault();
+            alert('Please select a date.');
+            return;
+        }
+        
+        const checkedRadios = document.querySelectorAll('input[type="radio"]:checked');
+        if (checkedRadios.length === 0) {
+            e.preventDefault();
+            alert('Please mark attendance for at least one student.');
+            return;
+        }
+        
+        // Confirm before submitting
+        if (!confirm('Are you sure you want to save the attendance for ' + date + '?')) {
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

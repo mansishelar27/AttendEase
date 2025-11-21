@@ -1,0 +1,198 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Teacher Dashboard - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-chalkboard-teacher me-2"></i>Teacher Dashboard</h2>
+            <div class="text-muted">
+                Welcome, <strong>{{ teacher.name }}</strong> - {{ teacher.subject }}
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ students|length }}</h4>
+                        <p class="card-text">Total Students</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-info text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h4 class="card-title">{{ teacher.subject }}</h4>
+                        <p class="card-text">Subject</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-book fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Quick Actions -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-bolt me-2"></i>Quick Actions</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'mark_attendance' %}" class="btn btn-primary w-100">
+                            <i class="fas fa-edit me-2"></i>Mark Attendance
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'leave_requests' %}" class="btn btn-warning w-100">
+                            <i class="fas fa-clipboard-list me-2"></i>Leave Requests
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <a href="{% url 'logout' %}" class="btn btn-outline-danger w-100">
+                            <i class="fas fa-sign-out-alt me-2"></i>Logout
+                        </a>
+                    </div>
+                    <div class="col-md-3 mb-2">
+                        <button class="btn btn-info w-100" onclick="location.reload()">
+                            <i class="fas fa-sync-alt me-2"></i>Refresh
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Attendance Summary -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0">
+                    <i class="fas fa-chart-bar me-2"></i>Attendance Summary - {{ teacher.subject }}
+                </h5>
+                <div class="btn-group" role="group">
+                    <a href="?filter=day" class="btn btn-sm btn-outline-primary {% if filter_type == 'day' %}active{% endif %}">
+                        <i class="fas fa-calendar-day me-1"></i>Day
+                    </a>
+                    <a href="?filter=week" class="btn btn-sm btn-outline-primary {% if filter_type == 'week' or not filter_type %}active{% endif %}">
+                        <i class="fas fa-calendar-week me-1"></i>Week
+                    </a>
+                    <a href="?filter=month" class="btn btn-sm btn-outline-primary {% if filter_type == 'month' %}active{% endif %}">
+                        <i class="fas fa-calendar-alt me-1"></i>Month
+                    </a>
+                    <a href="?filter=year" class="btn btn-sm btn-outline-primary {% if filter_type == 'year' %}active{% endif %}">
+                        <i class="fas fa-calendar me-1"></i>Year
+                    </a>
+                </div>
+            </div>
+            <div class="card-body">
+                {% if filter_type %}
+                    <div class="alert alert-info mb-3">
+                        <i class="fas fa-info-circle me-2"></i>
+                        Showing attendance for: <strong>{{ filter_display }}</strong>
+                    </div>
+                {% endif %}
+                
+                {% if attendance_summary %}
+                    <div class="table-responsive">
+                        <table class="table table-hover table-striped">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Roll No</th>
+                                    <th>Student Name</th>
+                                    <th>Present</th>
+                                    <th>Absent</th>
+                                    <th>Attendance %</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for summary in attendance_summary %}
+                                <tr>
+                                    <td><strong>{{ summary.roll_no }}</strong></td>
+                                    <td>{{ summary.name }}</td>
+                                    <td>
+                                        <span class="badge bg-success">{{ summary.present }}</span>
+                                    </td>
+                                    <td>
+                                        <span class="badge bg-danger">{{ summary.absent }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="progress" style="height: 25px;">
+                                            <div class="progress-bar {% if summary.percentage >= 75 %}bg-success{% elif summary.percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                 role="progressbar" 
+                                                 style="width: {{ summary.percentage }}%" 
+                                                 aria-valuenow="{{ summary.percentage }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ summary.percentage }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <!-- Summary Statistics -->
+                    <div class="row mt-4">
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-muted">Total Students</h5>
+                                    <h3 class="text-primary">{{ attendance_summary|length }}</h3>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card bg-light">
+                                <div class="card-body text-center">
+                                    <h5 class="text-muted">Average Attendance</h5>
+                                    <h3 class="text-success">
+                                        {% if attendance_summary %}
+                                            {{ total_avg }}%
+                                        {% else %}
+                                            0%
+                                        {% endif %}
+                                    </h3>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-chart-bar fa-4x mb-3"></i>
+                        <h4>No Attendance Records</h4>
+                        <p>No attendance records found for the selected period.</p>
+                        <a href="{% url 'mark_attendance' %}" class="btn btn-primary mt-3">
+                            <i class="fas fa-edit me-2"></i>Mark Attendance
+                        </a>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

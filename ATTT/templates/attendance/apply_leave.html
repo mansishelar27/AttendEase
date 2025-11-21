@@ -1,0 +1,160 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Apply for Leave - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-calendar-times me-2"></i>Apply for Leave</h2>
+            <a href="{% url 'student_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-calendar-alt me-2"></i>Leave Application Form</h5>
+            </div>
+            <div class="card-body">
+                <!-- Student Info -->
+                <div class="row mb-4">
+                    <div class="col-12">
+                        <div class="alert alert-info">
+                            <h6 class="alert-heading"><i class="fas fa-user me-2"></i>Student Information</h6>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <strong>Name:</strong> {{ student.name }}
+                                </div>
+                                <div class="col-md-6">
+                                    <strong>Roll No:</strong> {{ student.roll_no }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Leave Application Form -->
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="id_date" class="form-label">
+                                <i class="fas fa-calendar me-1"></i>Leave Date
+                            </label>
+                            {{ form.date }}
+                            {% if form.date.errors %}
+                                <div class="text-danger small">{{ form.date.errors.0 }}</div>
+                            {% endif %}
+                            <div class="form-text">Select the date for which you want to apply for leave.</div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">
+                                <i class="fas fa-info-circle me-1"></i>Quick Date Selection
+                            </label>
+                            <div class="btn-group w-100" role="group">
+                                <button type="button" class="btn btn-outline-primary" onclick="setToday()">Today</button>
+                                <button type="button" class="btn btn-outline-primary" onclick="setTomorrow()">Tomorrow</button>
+                                <button type="button" class="btn btn-outline-primary" onclick="setNextWeek()">Next Week</button>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="id_reason" class="form-label">
+                            <i class="fas fa-comment me-1"></i>Reason for Leave
+                        </label>
+                        {{ form.reason }}
+                        {% if form.reason.errors %}
+                            <div class="text-danger small">{{ form.reason.errors.0 }}</div>
+                        {% endif %}
+                        <div class="form-text">Please provide a detailed reason for your leave request.</div>
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'student_dashboard' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-warning">
+                            <i class="fas fa-paper-plane me-2"></i>Submit Leave Request
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function setToday() {
+        const today = new Date().toISOString().split('T')[0];
+        document.getElementById('id_date').value = today;
+    }
+    
+    function setTomorrow() {
+        const tomorrow = new Date();
+        tomorrow.setDate(tomorrow.getDate() + 1);
+        document.getElementById('id_date').value = tomorrow.toISOString().split('T')[0];
+    }
+    
+    function setNextWeek() {
+        const nextWeek = new Date();
+        nextWeek.setDate(nextWeek.getDate() + 7);
+        document.getElementById('id_date').value = nextWeek.toISOString().split('T')[0];
+    }
+    
+    // Add Bootstrap classes to form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const formFields = document.querySelectorAll('input, select, textarea');
+        formFields.forEach(field => {
+            if (!field.classList.contains('form-control')) {
+                field.classList.add('form-control');
+            }
+        });
+        
+        // Set minimum date to today
+        const dateField = document.getElementById('id_date');
+        if (dateField) {
+            dateField.min = new Date().toISOString().split('T')[0];
+        }
+    });
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const date = document.getElementById('id_date').value;
+        const reason = document.getElementById('id_reason').value.trim();
+        
+        if (!date) {
+            e.preventDefault();
+            alert('Please select a leave date.');
+            return;
+        }
+        
+        if (!reason) {
+            e.preventDefault();
+            alert('Please provide a reason for your leave request.');
+            return;
+        }
+        
+        if (reason.length < 10) {
+            e.preventDefault();
+            alert('Please provide a more detailed reason (at least 10 characters).');
+            return;
+        }
+        
+        // Confirm before submitting
+        if (!confirm('Are you sure you want to submit this leave request?')) {
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}

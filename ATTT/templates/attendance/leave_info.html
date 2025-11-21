@@ -1,0 +1,125 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Leave Information - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row mb-4">
+    <div class="col-12 d-flex justify-content-between align-items-center">
+        <h2><i class="fas fa-info-circle me-2"></i>Leave Information</h2>
+        <a href="{% url 'student_dashboard' %}" class="btn btn-outline-secondary">
+            <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+        </a>
+    </div>
+</div>
+
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-1">{{ total_leaves }}</h3>
+                <p class="mb-0">Total Requests</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h3 class="mb-1">{{ pending_count }}</h3>
+                <p class="mb-0">Pending</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-1">{{ approved_count }}</h3>
+                <p class="mb-0">Approved</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+                <h3 class="mb-1">{{ rejected_count }}</h3>
+                <p class="mb-0">Rejected</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-clock me-2"></i>Pending Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if leaves_pending %}
+                    {% for leave in leaves_pending %}
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-bold">{{ leave.date|date:"M d, Y" }}</div>
+                        <div class="small text-muted mb-2">{{ leave.created_at|date:"M d, Y g:i A" }}</div>
+                        <p class="mb-0">{{ leave.reason }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <p class="mb-0">No pending requests.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-success text-white">
+                <h5 class="mb-0"><i class="fas fa-check me-2"></i>Approved Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if leaves_approved %}
+                    {% for leave in leaves_approved %}
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-bold">{{ leave.date|date:"M d, Y" }}</div>
+                        <div class="small text-muted mb-2">{{ leave.created_at|date:"M d, Y g:i A" }}</div>
+                        <p class="mb-0">{{ leave.reason }}</p>
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <p class="mb-0">No approved requests.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 mb-4">
+        <div class="card h-100">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="fas fa-times me-2"></i>Rejected Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if leaves_rejected %}
+                    {% for leave in leaves_rejected %}
+                    <div class="border rounded p-3 mb-3">
+                        <div class="fw-bold">{{ leave.date|date:"M d, Y" }}</div>
+                        <div class="small text-muted mb-2">{{ leave.created_at|date:"M d, Y g:i A" }}</div>
+                        <p class="mb-0">{{ leave.reason }}</p>
+                        {% if leave.approval %}
+                        <div class="small text-muted mt-1">Notes: {{ leave.approval }}</div>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                {% else %}
+                    <div class="text-center text-muted py-4">
+                        <i class="fas fa-calendar-times fa-2x mb-2"></i>
+                        <p class="mb-0">No rejected requests.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+

@@ -1,0 +1,98 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}AttendEase - Home{% endblock %}
+
+{% block content %}
+<div class="hero-section text-center py-5">
+    <div class="container">
+        <h1 class="display-4 fw-bold text-primary mb-4">
+            <i class="fas fa-graduation-cap me-3"></i>Welcome to AttendEase
+        </h1>
+        <p class="lead mb-4">A modern, web-based student attendance tracking system that simplifies attendance management for teachers and provides transparency for students.</p>
+        
+        {% if not user.is_authenticated %}
+        <div class="row justify-content-center">
+            <div class="col-md-8">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5">
+                        <h3 class="card-title mb-4">Get Started</h3>
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <div class="d-grid">
+                                    <a href="{% url 'student_register' %}" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-user-graduate me-2"></i>Register as Student
+                                    </a>
+                                </div>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <div class="d-grid">
+                                    <a href="{% url 'teacher_register' %}" class="btn btn-success btn-lg">
+                                        <i class="fas fa-chalkboard-teacher me-2"></i>Register as Teacher
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                        <hr class="my-4">
+                        <div class="text-center">
+                            <p class="mb-3">Already have an account?</p>
+                            <a href="{% url 'login' %}" class="btn btn-outline-primary">
+                                <i class="fas fa-sign-in-alt me-2"></i>Login
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="row justify-content-center">
+            <div class="col-md-6">
+                <div class="card shadow-lg">
+                    <div class="card-body p-5 text-center">
+                        <h3 class="card-title mb-4">Welcome back, {{ user.username }}!</h3>
+                        <p class="mb-4">Access your dashboard to manage attendance and leave requests.</p>
+                        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-lg">
+                            <i class="fas fa-tachometer-alt me-2"></i>Go to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Features Section -->
+<div class="container py-5">
+    <h2 class="text-center mb-5">Key Features</h2>
+    <div class="row">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-check fa-3x text-primary mb-3"></i>
+                    <h5 class="card-title">Digital Attendance</h5>
+                    <p class="card-text">Teachers can easily mark attendance digitally, eliminating paper-based systems and reducing errors.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-chart-line fa-3x text-success mb-3"></i>
+                    <h5 class="card-title">Real-time Tracking</h5>
+                    <p class="card-text">Students can view their attendance records in real-time with detailed statistics and percentages.</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm">
+                <div class="card-body text-center">
+                    <i class="fas fa-calendar-times fa-3x text-warning mb-3"></i>
+                    <h5 class="card-title">Leave Management</h5>
+                    <p class="card-text">Students can apply for leave online, and teachers can approve or reject requests efficiently.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock %}

@@ -1,0 +1,204 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Leave Requests - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-clipboard-list me-2"></i>Leave Requests Management</h2>
+            <a href="{% url 'teacher_dashboard' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">{{ leave_requests|length }}</h4>
+                <p class="card-text">Total Requests</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-warning text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">{{ leave_requests|length }}</h4>
+                <p class="card-text">Pending</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">0</h4>
+                <p class="card-text">Approved</p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-3 mb-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+                <h4 class="card-title">0</h4>
+                <p class="card-text">Rejected</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filter Options -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col-md-6">
+                        <h6 class="mb-0"><i class="fas fa-filter me-2"></i>Filter Leave Requests</h6>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="btn-group w-100" role="group">
+                            <button type="button" class="btn btn-outline-primary active" onclick="filterRequests('all')">All</button>
+                            <button type="button" class="btn btn-outline-warning" onclick="filterRequests('pending')">Pending</button>
+                            <button type="button" class="btn btn-outline-success" onclick="filterRequests('approved')">Approved</button>
+                            <button type="button" class="btn btn-outline-danger" onclick="filterRequests('rejected')">Rejected</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Leave Requests Table -->
+<div class="row">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-list me-2"></i>All Leave Requests</h5>
+            </div>
+            <div class="card-body">
+                {% if leave_requests %}
+                    <div class="table-responsive">
+                        <table class="table table-hover" id="leaveRequestsTable">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>Student</th>
+                                    <th>Roll No</th>
+                                    <th>Leave Date</th>
+                                    <th>Reason</th>
+                                    <th>Applied On</th>
+                                    <th>Status</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for leave in leave_requests %}
+                                <tr class="leave-row" data-status="{{ leave.status }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            <div class="avatar-circle me-2">
+                                                <i class="fas fa-user"></i>
+                                            </div>
+                                            {{ leave.student.name }}
+                                        </div>
+                                    </td>
+                                    <td>{{ leave.student.roll_no }}</td>
+                                    <td>
+                                        <span class="badge bg-info">{{ leave.date|date:"M d, Y" }}</span>
+                                    </td>
+                                    <td>
+                                        <div class="reason-text" data-bs-toggle="tooltip" title="{{ leave.reason }}">
+                                            {{ leave.reason|truncatechars:50 }}
+                                        </div>
+                                    </td>
+                                    <td>{{ leave.created_at|date:"M d, Y" }}</td>
+                                    <td>
+                                        <span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% else %}warning{% endif %} fs-6">
+                                            <i class="fas fa-{% if leave.status == 'approved' %}check{% elif leave.status == 'rejected' %}times{% else %}clock{% endif %} me-1"></i>
+                                            {{ leave.status|title }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if leave.status == 'pending' %}
+                                            <a href="{% url 'approve_leave' leave.id %}" class="btn btn-sm btn-primary">
+                                                <i class="fas fa-edit me-1"></i>Review
+                                            </a>
+                                        {% else %}
+                                            <span class="text-muted small">
+                                                {% if leave.approved_by %}
+                                                    by {{ leave.approved_by.name }}
+                                                {% endif %}
+                                            </span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                {% else %}
+                    <div class="text-center text-muted py-5">
+                        <i class="fas fa-clipboard-list fa-4x mb-3"></i>
+                        <h4>No Leave Requests</h4>
+                        <p>There are no leave requests to review at the moment.</p>
+                    </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    function filterRequests(status) {
+        const rows = document.querySelectorAll('.leave-row');
+        rows.forEach(row => {
+            if (status === 'all' || row.dataset.status === status) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Update button states
+        document.querySelectorAll('.btn-group .btn').forEach(btn => {
+            btn.classList.remove('active');
+        });
+        event.target.classList.add('active');
+    }
+    
+    // Initialize tooltips
+    document.addEventListener('DOMContentLoaded', function() {
+        var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+        var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+            return new bootstrap.Tooltip(tooltipTriggerEl);
+        });
+    });
+</script>
+
+<style>
+.avatar-circle {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    background-color: #007bff;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.reason-text {
+    cursor: help;
+}
+</style>
+{% endblock %}

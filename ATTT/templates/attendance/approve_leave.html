@@ -1,0 +1,185 @@
+{% extends 'attendance/base.html' %}
+
+{% block title %}Review Leave Request - AttendEase{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2><i class="fas fa-edit me-2"></i>Review Leave Request</h2>
+            <a href="{% url 'leave_requests' %}" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i>Back to Leave Requests
+            </a>
+        </div>
+    </div>
+</div>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <!-- Student Information -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0"><i class="fas fa-user me-2"></i>Student Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Name:</strong> {{ leave.student.name }}
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Roll No:</strong> {{ leave.student.roll_no }}
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Leave Request Details -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0"><i class="fas fa-calendar-times me-2"></i>Leave Request Details</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <strong>Leave Date:</strong>
+                        <span class="badge bg-info fs-6 ms-2">{{ leave.date|date:"M d, Y" }} ({{ leave.date|date:"l" }})</span>
+                    </div>
+                    <div class="col-md-6">
+                        <strong>Applied On:</strong> {{ leave.created_at|date:"M d, Y g:i A" }}
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <strong>Reason for Leave:</strong>
+                        <div class="mt-2 p-3 bg-light rounded">
+                            {{ leave.reason }}
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-12">
+                        <strong>Current Status:</strong>
+                        <span class="badge bg-{% if leave.status == 'approved' %}success{% elif leave.status == 'rejected' %}danger{% else %}warning{% endif %} fs-6 ms-2">
+                            <i class="fas fa-{% if leave.status == 'approved' %}check{% elif leave.status == 'rejected' %}times{% else %}clock{% endif %} me-1"></i>
+                            {{ leave.status|title }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Approval Form -->
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0"><i class="fas fa-gavel me-2"></i>Review & Decision</h5>
+            </div>
+            <div class="card-body">
+                <form method="post">
+                    {% csrf_token %}
+                    
+                    <div class="mb-3">
+                        <label for="id_status" class="form-label">
+                            <i class="fas fa-check-circle me-1"></i>Decision
+                        </label>
+                        {{ form.status }}
+                        {% if form.status.errors %}
+                            <div class="text-danger small">{{ form.status.errors.0 }}</div>
+                        {% endif %}
+                    </div>
+                    
+                    <!-- Action Buttons -->
+                    <div class="d-flex justify-content-between">
+                        <a href="{% url 'leave_requests' %}" class="btn btn-secondary">
+                            <i class="fas fa-times me-2"></i>Cancel
+                        </a>
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i>Save Decision
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Student's Leave History -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="fas fa-history me-2"></i>{{ leave.student.name }}'s Leave History</h5>
+            </div>
+            <div class="card-body">
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Date</th>
+                                <th>Reason</th>
+                                <th>Status</th>
+                                <th>Applied On</th>
+                                <th>Approved By</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for history_leave in leave.student.leave_requests.all %}
+                            <tr class="{% if history_leave.id == leave.id %}table-warning{% endif %}">
+                                <td>{{ history_leave.date|date:"M d, Y" }}</td>
+                                <td>{{ history_leave.reason|truncatechars:40 }}</td>
+                                <td>
+                                    <span class="badge bg-{% if history_leave.status == 'approved' %}success{% elif history_leave.status == 'rejected' %}danger{% else %}warning{% endif %}">
+                                        {{ history_leave.status|title }}
+                                    </span>
+                                </td>
+                                <td>{{ history_leave.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    {% if history_leave.approved_by %}
+                                        {{ history_leave.approved_by.name }}
+                                    {% else %}
+                                        <span class="text-muted">-</span>
+                                    {% endif %}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    
+    // Add Bootstrap classes to form fields
+    document.addEventListener('DOMContentLoaded', function() {
+        const formFields = document.querySelectorAll('input, select, textarea');
+        formFields.forEach(field => {
+            if (!field.classList.contains('form-control')) {
+                field.classList.add('form-control');
+            }
+        });
+    });
+    
+    // Form validation
+    document.querySelector('form').addEventListener('submit', function(e) {
+        const status = document.getElementById('id_status').value;
+        
+        if (!status) {
+            e.preventDefault();
+            alert('Please select a decision (Approve/Reject/Pending).');
+            return;
+        }
+        
+        // Confirm before submitting
+        const action = status === 'approved' ? 'approve' : status === 'rejected' ? 'reject' : 'keep pending';
+        if (!confirm(`Are you sure you want to ${action} this leave request?`)) {
+            e.preventDefault();
+        }
+    });
+</script>
+{% endblock %}
